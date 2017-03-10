@@ -9,8 +9,9 @@ from user_agents import parse
 
 
 reader = geoip2.database.Reader('GeoLite2-City.mmdb')
-line_parser = apache_log_parser.make_parser(
-    "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"")
+
+_format = "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\""
+line_parser = apache_log_parser.make_parser(_format)
 
 CIDRS = {
     'Amazon': ['107.20.0.0/14', '122.248.192.0/19', '122.248.224.0/19',
