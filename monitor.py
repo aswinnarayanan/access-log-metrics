@@ -108,6 +108,7 @@ def bot_test(req, agent):
                      'httpclient',
                      'https://',
                      'libwww-perl',
+                     'phantomjs',
                      'proxy',
                      'python',
                      'sitesucker',
