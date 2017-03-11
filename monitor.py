@@ -95,9 +95,10 @@ CIDRS = {
 
 
 def in_block(ip, block):
+        _ip = IPAddress(ip)
         return any([True
                     for cidr in block
-                    if IPAddress(ip) in IPNetwork(cidr)])
+                    if _ip in IPNetwork(cidr)])
 
 
 def bot_test(req, agent):
