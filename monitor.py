@@ -1,8 +1,7 @@
 import sys
-from urlparse import urlparse
+import urllib.parse as urlparse
 
 import apache_log_parser
-from colorama import Back, Style
 import geoip2.database
 from netaddr import IPNetwork, IPAddress
 from user_agents import parse
@@ -163,10 +162,10 @@ if __name__ == '__main__':
                                   for network, cidr in CIDRS.iteritems()
                                   if in_block(req['remote_host'], cidr)])
 
-        print Back.RED + 'b' if is_bot else 'h', \
-              country, \
-              city, \
-              uri.path, \
-              agent_str, \
-              ip_owner_str, \
-              Style.RESET_ALL
+        # print Back.RED + 'b' if is_bot else 'h', \
+        #       country, \
+        #       city, \
+        #       uri.path, \
+        #       agent_str, \
+        #       ip_owner_str, \
+        #       Style.RESET_ALL
