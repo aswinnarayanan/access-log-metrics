@@ -1,11 +1,10 @@
 import sys
-import urllib.parse as urlparse
+from urllib.parse import urlparse
 
 import apache_log_parser
 import geoip2.database
 from netaddr import IPNetwork, IPAddress
 from user_agents import parse
-
 
 reader = geoip2.database.Reader('GeoLite2-City.mmdb')
 
@@ -159,13 +158,12 @@ if __name__ == '__main__':
                                 item != 'Other'])
 
         ip_owner_str = ', '.join([network + ' IP'
-                                  for network, cidr in CIDRS.iteritems()
+                                  for network, cidr in CIDRS.items()
                                   if in_block(req['remote_host'], cidr)])
 
-        # print Back.RED + 'b' if is_bot else 'h', \
-        #       country, \
-        #       city, \
-        #       uri.path, \
-        #       agent_str, \
-        #       ip_owner_str, \
-        #       Style.RESET_ALL
+        print(' BOT  -' if is_bot else 'HUMAN |', \
+              country, \
+              city, \
+              uri.path, \
+              agent_str, \
+              ip_owner_str)
