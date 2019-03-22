@@ -1,0 +1,13 @@
+apache-log-parser==1.7.0
+certifi==2019.3.9
+chardet==3.0.4
+geoip2==2.9.0
+idna==2.8
+maxminddb==1.4.1
+netaddr==0.7.19
+requests==2.21.0
+six==1.12.0
+ua-parser==0.8.0
+urllib3==1.24.1
+user-agents==1.1.0
+wincertstore==0.2
