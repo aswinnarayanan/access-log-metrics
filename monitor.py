@@ -53,43 +53,48 @@ def bot_test(req, agent):
 
 
 if __name__ == '__main__':
-    while True:
-        try:
-            line = sys.stdin.readline()
-        except KeyboardInterrupt:
-            break
+    with open('output.csv', 'w+') as f:
+        f.write('agent, ip_addr, date, time, country, city, uri, agent_str')
+        run = True
+        while run:
+            f.write('\n')
+            try:
+                line = sys.stdin.readline()
+            except KeyboardInterrupt:
+                f.flush()
+                break
 
-        if not line:
-            break
+            if not line:
+                break
 
-        req = line_parser(line)
-        agent = parse(req['request_header_user_agent'])
-        uri = urlparse(req['request_url'])
+            req = line_parser(line)
+            agent = parse(req['request_header_user_agent'])
+            uri = urlparse(req['request_url'])
+            date = req['time_received_datetimeobj'].date()
+            time = req['time_received_datetimeobj'].time()
+            ip_addr = req['remote_host']
+            try:
+                response = reader.city(req['remote_host'])
+                country, city = response.country.name, response.city.name
+            except:
+                country, city = None, None
 
-        try:
-            response = reader.city(req['remote_host'])
-            country, city = response.country.iso_code, response.city.name
-        except:
-            country, city = None, None
+            is_bot = bot_test(req, agent)
 
-        is_bot = bot_test(req, agent)
+            agent_str = ''.join([item
+                                 for item in agent.browser[0:3] +
+                                             agent.device[0:3] +
+                                             agent.os[0:3]
+                                 if item is not None and
+                                    type(item) is not tuple and
+                                    len(item.strip()) and
+                                    item != 'Other'])
 
-        agent_str = ''.join([item
-                             for item in agent.browser[0:3] +
-                                         agent.device[0:3] +
-                                         agent.os[0:3]
-                             if item is not None and
-                                type(item) is not tuple and
-                                len(item.strip()) and
-                                item != 'Other'])
+            ip_owner_str = ', '.join([network + ' IP'
+                                      for network, cidr in CIDRS.items()
+                                      if in_block(req['remote_host'], cidr)])
 
-        ip_owner_str = ', '.join([network + ' IP'
-                                  for network, cidr in CIDRS.items()
-                                  if in_block(req['remote_host'], cidr)])
-
-        print(' BOT  -' if is_bot else 'HUMAN |',
-              country,
-              city,
-              uri.path,
-              agent_str,
-              ip_owner_str)
+            entry = 'BOT' if is_bot else 'HUMAN', ip_addr, date, time, country, city, uri.path, agent_str
+            entry = tuple(map(str, entry))
+            print(entry)
+            f.write(','.join(entry))
