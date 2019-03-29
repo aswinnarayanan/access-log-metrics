@@ -54,7 +54,7 @@ def bot_test(req, agent):
 
 if __name__ == '__main__':
     with open('output.csv', 'w+') as f:
-        f.write('agent, ip_addr, date, time, country, city, uri, agent_str')
+        f.write('agent, ip_address, date, time, country, city, uri, agent_string')
         run = True
         while run:
             f.write('\n')
@@ -69,10 +69,10 @@ if __name__ == '__main__':
 
             req = line_parser(line)
             agent = parse(req['request_header_user_agent'])
-            uri = urlparse(req['request_url'])
+            uri = urlparse(req['request_url']).path
             date = req['time_received_datetimeobj'].date()
             time = req['time_received_datetimeobj'].time()
-            ip_addr = req['remote_host']
+            ip_address = req['remote_host']
             try:
                 response = reader.city(req['remote_host'])
                 country, city = response.country.name, response.city.name
@@ -94,7 +94,7 @@ if __name__ == '__main__':
                                       for network, cidr in CIDRS.items()
                                       if in_block(req['remote_host'], cidr)])
 
-            entry = 'BOT' if is_bot else 'HUMAN', ip_addr, date, time, country, city, uri.path, agent_str
+            entry = 'BOT' if is_bot else 'HUMAN', ip_address, date, time, country, city, uri, agent_str
             entry = tuple(map(str, entry))
             print(entry)
             f.write(','.join(entry))
