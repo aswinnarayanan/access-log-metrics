@@ -1,10 +1,11 @@
 import sys
-from urllib.parse import urlparse
+import urllib.parse
+
 
 import apache_log_parser
 import geoip2.database
-from netaddr import IPNetwork, IPAddress
-from user_agents import parse
+import netaddr
+import user_agents
 
 import json
 
@@ -19,10 +20,10 @@ with open('blacklist.json') as f:
 
 
 def in_block(ip, block):
-        _ip = IPAddress(ip)
+        _ip = netaddr.IPAddress(ip)
         return any([True
                     for cidr in block
-                    if _ip in IPNetwork(cidr)])
+                    if _ip in netaddr.IPNetwork(cidr)])
 
 
 def bot_test(req, agent):
@@ -52,49 +53,34 @@ def bot_test(req, agent):
         return is_bot
 
 
-if __name__ == '__main__':
-    with open('output.csv', 'w+') as f:
-        f.write('agent, ip_address, date, time, country, city, uri, agent_string')
-        run = True
-        while run:
-            f.write('\n')
-            try:
-                line = sys.stdin.readline()
-            except KeyboardInterrupt:
-                f.flush()
-                break
+def lineparse(line):
+    req = line_parser(line)
+    agent = user_agents.parse(req['request_header_user_agent'])
+    uri = urllib.parse.urlparse(req['request_url']).path
+    date = req['time_received_datetimeobj'].date()
+    time = req['time_received_datetimeobj'].time()
+    ip_address = req['remote_host']
+    try:
+        response = reader.city(req['remote_host'])
+        country, city = response.country.name, response.city.name
+    except:
+        country, city = None, None
 
-            if not line:
-                break
+    is_bot = bot_test(req, agent)
 
-            req = line_parser(line)
-            agent = parse(req['request_header_user_agent'])
-            uri = urlparse(req['request_url']).path
-            date = req['time_received_datetimeobj'].date()
-            time = req['time_received_datetimeobj'].time()
-            ip_address = req['remote_host']
-            try:
-                response = reader.city(req['remote_host'])
-                country, city = response.country.name, response.city.name
-            except:
-                country, city = None, None
+    agent_str = ''.join([item
+                         for item in agent.browser[0:3] +
+                                     agent.device[0:3] +
+                                     agent.os[0:3]
+                         if item is not None and
+                            type(item) is not tuple and
+                            len(item.strip()) and
+                            item != 'Other'])
 
-            is_bot = bot_test(req, agent)
+    ip_owner_str = ', '.join([network + ' IP'
+                              for network, cidr in CIDRS.items()
+                              if in_block(req['remote_host'], cidr)])
 
-            agent_str = ''.join([item
-                                 for item in agent.browser[0:3] +
-                                             agent.device[0:3] +
-                                             agent.os[0:3]
-                                 if item is not None and
-                                    type(item) is not tuple and
-                                    len(item.strip()) and
-                                    item != 'Other'])
-
-            ip_owner_str = ', '.join([network + ' IP'
-                                      for network, cidr in CIDRS.items()
-                                      if in_block(req['remote_host'], cidr)])
-
-            entry = 'BOT' if is_bot else 'HUMAN', ip_address, date, time, country, city, uri, agent_str
-            entry = tuple(map(str, entry))
-            print(entry)
-            f.write(','.join(entry))
+    entry = 'BOT' if is_bot else 'HUMAN', ip_address, date, time, country, city, uri, agent_str
+    entry = tuple(map(str, entry))
+    return entry
