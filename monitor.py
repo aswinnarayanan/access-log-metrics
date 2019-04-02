@@ -39,8 +39,7 @@ def bot_test(req, agent):
                      'python',
                      'sitesucker',
                      'wada.vn',
-                     'webindex',
-                     'wget']
+                     'webindex']  # 'wget'
 
         is_bot = agent.is_bot or \
                  any([True
