@@ -83,3 +83,15 @@ def lineparse(line):
     entry = 'BOT' if is_bot else 'HUMAN', ip_address, date, time, country, city, uri, agent_str
     entry = tuple(map(str, entry))
     return entry
+
+
+if __name__ == '__main__':
+    while True:
+        try:
+            line = sys.stdin.readline()
+        except KeyboardInterrupt:
+            break
+
+        if line:
+            entry = lineparse(line)
+            print(entry)
