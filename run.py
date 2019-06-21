@@ -2,37 +2,36 @@ import sys
 import monitor
 
 
-def write_data():
-    with open('output.csv', 'w+') as f:
-        f.write('agent, ip_address, date, time, country, city, uri, agent_string')
-        run = True
-        while run:
-            f.write('\n')
+def write_data(infile, outfile):
+    with open(outfile, 'w+') as fout:
+        fout.write('agent, ip_address, date, time, country, city, uri, agent_string')
+        with open(infile) as fin:
+            for line in fin:
+                try:
+                    entry = monitor.lineparse(line)
+                    print(entry)
+                    fout.write('\n')
+                    fout.write(','.join(entry))
+                except KeyboardInterrupt:
+                    fout.flush()
+                    break
+
+
+def print_data(infile):
+    with open(infile) as fin:
+        for line in fin:
             try:
-                line = sys.stdin.readline()
+                entry = monitor.lineparse(line)
+                print(entry)
             except KeyboardInterrupt:
-                f.flush()
                 break
-
-            if not line:
-                break
-
-            entry = monitor.lineparse(line)
-            print(entry)
-            f.write(','.join(entry))
-
-
-def print_data():
-    while True:
-        try:
-            line = sys.stdin.readline()
-        except KeyboardInterrupt:
-            break
-
-        if line:
-            entry = monitor.lineparse(line)
-            print(entry)
 
 
 if __name__ == '__main__':
-    print_data()
+    infile = sys.argv[1]
+    if len(sys.argv) == 2:
+        print_data(sys.argv[1])
+    elif len(sys.argv) == 3:
+        write_data(sys.argv[1], sys.argv[2])
+    else:
+        raise Exception
