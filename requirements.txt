@@ -1,5 +1,5 @@
 apache-log-parser==1.7.0
-certifi==2019.3.9
+certifi
 chardet==3.0.4
 geoip2==2.9.0
 idna==2.8
