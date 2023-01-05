@@ -1,5 +1,5 @@
 import sys
-import monitor
+# import monitor
 
 
 def write_data(infile, outfile):
@@ -8,7 +8,7 @@ def write_data(infile, outfile):
         with open(infile) as fin:
             for line in fin:
                 try:
-                    entry = monitor.lineparse(line)
+                    entry = line
                     print(entry)
                     fout.write('\n')
                     fout.write(','.join(entry))
@@ -21,7 +21,7 @@ def print_data(infile):
     with open(infile) as fin:
         for line in fin:
             try:
-                entry = monitor.lineparse(line)
+                entry = line
                 print(entry)
             except KeyboardInterrupt:
                 break
